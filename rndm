@@ -1,0 +1,563 @@
+<html lang="en" style="--bg: #0b0a16; --accent: #7a5cff; --blue: #00bfff; --text: #e6e6ff; --surface: rgba(255,255,255,0.05); --border: rgba(255,255,255,0.1); --card-bg: rgba(255,255,255,0.03); --primary: #7a5cff;">
+<head>
+<base target="_blank">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1a1a1a;
+    --primary-hover: #5936a6;
+    --accent: #f6c90e;
+    --text: #e6e6fa;
+    --bg: #1a1030;
+    --border: #3b2a65;
+    --radius: 12px;
+    
+    /* Dynamic Theme Variables Defaults */
+    --surface: rgba(255,255,255,0.05);
+    --card-bg: rgba(255,255,255,0.03);
+    --shadow: rgba(0,0,0,0.3);
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 1rem;
+    transition: background-color 0.3s, color 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Title */
+  .page-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 2.5rem;
+    margin: 2rem 0 1rem 0;
+    text-align: center;
+    color: var(--text);
+  }
+
+  /* Search Bar */
+  #searchBar {
+    width: 100%;
+    max-width: 500px;
+    padding: 0.875rem 1rem;
+    border: 0;
+    border-radius: var(--radius);
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    color: var(--text);
+    font-size: 15px;
+    outline: none;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px var(--shadow);
+    border: 1px solid var(--border);
+  }
+  #searchBar:focus {
+    background: #fff;
+    color: #000;
+    box-shadow: 0 0 0 3px var(--primary), 0 4px 12px var(--shadow);
+  }
+
+  /* Grid */
+  #container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  .zone-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .zone-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 5px 15px var(--shadow);
+    border-color: var(--accent);
+  }
+  .zone-item img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    display: block;
+  }
+  
+  /* Game name overlay that appears on hover */
+  .zone-name-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.85);
+    color: var(--text);
+    padding: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    backdrop-filter: blur(5px);
+    border-top: 1px solid var(--accent);
+    z-index: 10;
+    font-size: 0.9rem;
+    line-height: 1.2;
+  }
+  .zone-item:hover .zone-name-overlay {
+    transform: translateY(0);
+  }
+
+  /* Fullscreen Overlay */
+  #fullscreenOverlay {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: none;
+    flex-direction: column;
+    z-index: 2000;
+    height: 100vh;
+    width: 100vw;
+  }
+  #fullscreenHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(0,0,0,0.8);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    border-bottom: 1px solid #333;
+  }
+  .header-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin-left: 0.5rem;
+  }
+  #zoneFullscreenFrame {
+    flex: 1;
+    width: 100%;
+    border: none;
+  }
+
+  /* Snow Effect */
+  .snow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1;
+  }
+  
+  .snowflake {
+    position: absolute;
+    top: -10px;
+    color: rgba(255, 255, 255, 0.8);
+    user-select: none;
+    pointer-events: none;
+    animation: fall linear infinite;
+    font-size: 10px;
+  }
+  
+  @keyframes fall {
+    from {
+      transform: translateY(-100px);
+    }
+    to {
+      transform: translateY(calc(100vh + 100px));
+    }
+  }
+  
+  @keyframes sway {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(50px);
+    }
+  }
+
+  /* Ensure content is above snow */
+  body > *:not(.snow) {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* --- NEW THEME PANEL STYLES --- */
+  #themeFab {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 50%;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    z-index: 1000;
+    transition: transform 0.2s;
+  }
+  #themeFab:hover {
+    transform: scale(1.1);
+  }
+  #themePanel {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px;
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    z-index: 1000;
+    width: 150px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  #themePanel.visible {
+    display: flex;
+  }
+  .theme-option {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+  }
+  .theme-option:hover {
+    background: var(--primary);
+    color: #fff;
+  }
+</style>
+</head>
+<body>
+
+<div class="snow" id="snowContainer"></div>
+<h1 class="page-title">Games</h1>
+<input type="text" id="searchBar" placeholder="Search games..." oninput="filterZones()">
+<div id="container">
+  <!-- Games will be loaded here dynamically -->
+</div>
+
+<div id="fullscreenOverlay">
+  <div id="fullscreenHeader">
+    <h2 id="gameTitle" style="margin:0; font-size:1.2rem;">Game Title</h2>
+    <div>
+      <button id="fullscreenBtn" class="header-btn" title="Fullscreen"><i class="fas fa-expand"></i></button>
+      <button id="closeFullscreen" class="header-btn" title="Close"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+  <iframe id="zoneFullscreenFrame"></iframe>
+</div>
+
+<button id="themeFab" title="Change Theme"><i class="fas fa-palette"></i></button>
+<div id="themePanel">
+  <!-- Theme buttons will be added dynamically -->
+</div>
+
+<script>
+/* --- GAME LOADING LOGIC --- */
+const container = document.getElementById('container');
+const searchBar = document.getElementById('searchBar');
+const overlay = document.getElementById('fullscreenOverlay');
+const iframe = document.getElementById('zoneFullscreenFrame');
+const gameTitle = document.getElementById('gameTitle');
+
+const zonesURLs = ["https://cdn.jsdelivr.net/gh/gn-math/assets@main/zones.json"];
+const coverURL = "https://cdn.jsdelivr.net/gh/gn-math/covers@main";
+const htmlURL = "https://cdn.jsdelivr.net/gh/gn-math/html@main";
+
+let zones = [];
+let zonesURL = zonesURLs[Math.floor(Math.random() * zonesURLs.length)];
+
+async function loadZones() {
+  try {
+    const response = await fetch(zonesURL);
+    zones = await response.json();
+    zones = zones.filter(zone => zone.id >= 0 && zone.id <= 5000);
+    displayZones();
+  } catch (e) {
+    container.innerHTML = 'Failed to load zones.';
+  }
+}
+
+function displayZones(list = zones) {
+  container.innerHTML = '';
+  list.forEach(zone => {
+    const item = document.createElement('div');
+    item.className = 'zone-item';
+    
+    const img = document.createElement('img');
+    img.dataset.src = zone.cover.replace('{COVER_URL}', coverURL).replace('{HTML_URL}', htmlURL);
+    img.alt = zone.name;
+    img.loading = 'lazy';
+
+    // Create overlay for game name
+    const nameOverlay = document.createElement('div');
+    nameOverlay.className = 'zone-name-overlay';
+    nameOverlay.textContent = zone.name;
+    
+    item.onclick = () => openZone(zone);
+    
+    item.appendChild(img);
+    item.appendChild(nameOverlay);
+    container.appendChild(item);
+  });
+  
+  // Lazy Loading
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.src = e.target.dataset.src;
+        obs.unobserve(e.target);
+      }
+    });
+  });
+  document.querySelectorAll('img[data-src]').forEach(i => observer.observe(i));
+}
+
+function filterZones() {
+  const query = searchBar.value.toLowerCase();
+  displayZones(zones.filter(z => z.name.toLowerCase().includes(query)));
+}
+
+async function openZone(zone) {
+  overlay.style.display = 'flex';
+  gameTitle.textContent = zone.name;
+  
+  const zoneUrl = zone.url;
+  if (!zoneUrl) return alert('Url missing');
+  
+  if (zoneUrl.startsWith('http')) {
+    iframe.src = zoneUrl;
+  } else {
+    const fullUrl = zoneUrl.replace('{COVER_URL}', coverURL).replace('{HTML_URL}', htmlURL);
+    try {
+      const resp = await fetch(fullUrl);
+      const html = await resp.text();
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      iframe.src = url;
+    } catch (e) {
+      iframe.src = fullUrl;
+    }
+  }
+}
+
+document.getElementById('closeFullscreen').onclick = () => { overlay.style.display = 'none'; iframe.src = ''; };
+document.getElementById('fullscreenBtn').onclick = () => iframe.requestFullscreen().catch(console.error);
+loadZones();
+
+/* --- THEME LOGIC --- */
+const root = document.documentElement;
+const themePanel = document.getElementById('themePanel');
+const themeFab = document.getElementById('themeFab');
+
+const themes = {
+  default: {
+    "--bg": "#1a1a1a",
+    "--accent": "#1a1a1a",
+    "--blue": "#1a1a1a",
+    "--text": "#e6e6ff",
+    "--surface": "rgba(255,255,255,0.05)",
+    "--border": "rgba(255,255,255,0.1)",
+    "--card-bg": "rgba(255,255,255,0.03)",
+    "--primary": "#1a1a1a"
+  },
+  cyber: {
+    "--bg": "#050c1b",
+    "--accent": "#39ff14",
+    "--blue": "#00ffff",
+    "--text": "#e0ffe0",
+    "--surface": "rgba(0,255,0,0.05)",
+    "--border": "rgba(0,255,0,0.1)",
+    "--card-bg": "rgba(0,255,0,0.03)",
+    "--primary": "#39ff14"
+  },
+  sunset: {
+    "--bg": "#1a0b0b",
+    "--accent": "#ff6f61",
+    "--blue": "#ffa500",
+    "--text": "#fff0e6",
+    "--surface": "rgba(255,110,100,0.05)",
+    "--border": "rgba(255,110,100,0.1)",
+    "--card-bg": "rgba(255,110,100,0.03)",
+    "--primary": "#ff6f61"
+  },
+  neon: {
+    "--bg": "#0f0020",
+    "--accent": "#ff00ff",
+    "--blue": "#00ffff",
+    "--text": "#ffffff",
+    "--surface": "rgba(255,0,255,0.05)",
+    "--border": "rgba(255,0,255,0.1)",
+    "--card-bg": "rgba(255,0,255,0.03)",
+    "--primary": "#ff00ff"
+  },
+  darkred: {
+    "--bg": "#1b0000",
+    "--accent": "#ff0000",
+    "--blue": "#cc0000",
+    "--text": "#ffe6e6",
+    "--surface": "rgba(255,0,0,0.05)",
+    "--border": "rgba(255,0,0,0.1)",
+    "--card-bg": "rgba(255,0,0,0.03)",
+    "--primary": "#ff0000"
+  },
+  dnv2: {
+    "--bg": "#050007",
+    "--accent": "#ff00de",
+    "--blue": "#00fff7",
+    "--text": "#ffffff",
+    "--surface": "rgba(255, 0, 255, 0.05)",
+    "--border": "rgba(255, 0, 255, 0.15)",
+    "--card-bg": "rgba(15, 0, 30, 0.7)",
+    "--primary": "#ff00de"
+  },
+  matrix: {
+    "--bg": "#001100",
+    "--accent": "#00ff00",
+    "--blue": "#33ff33",
+    "--text": "#99ff99",
+    "--surface": "rgba(0, 255, 0, 0.05)",
+    "--border": "rgba(0, 255, 0, 0.15)",
+    "--card-bg": "rgba(0, 50, 0, 0.7)",
+    "--primary": "#00ff00"
+  }
+};
+
+// Toggle Panel
+themeFab.onclick = (e) => {
+  e.stopPropagation();
+  themePanel.classList.toggle('visible');
+};
+
+// Close panel when clicking outside
+document.addEventListener('click', (e) => {
+  if (!themePanel.contains(e.target) && !themeFab.contains(e.target)) {
+    themePanel.classList.remove('visible');
+  }
+});
+
+// Apply Theme Function
+function applyTheme(name) {
+  const theme = themes[name];
+  if (!theme) return;
+  
+  // Apply each CSS variable
+  Object.entries(theme).forEach(([key, value]) => {
+    root.style.setProperty(key, value);
+  });
+  
+  // Save preference to localStorage
+  localStorage.setItem("dominum-theme", name);
+}
+
+// Generate Buttons
+Object.keys(themes).forEach(name => {
+  const btn = document.createElement('button');
+  btn.className = 'theme-option';
+  btn.textContent = name.charAt(0).toUpperCase() + name.slice(1); // Capitalize
+  btn.onclick = () => {
+    applyTheme(name);
+    themePanel.classList.remove('visible');
+  };
+  themePanel.appendChild(btn);
+});
+
+// Load Saved Theme on page load
+(function() {
+  const saved = localStorage.getItem("dominum-theme") || "default";
+  applyTheme(saved);
+})();
+
+/* --- SNOW EFFECT --- */
+function createSnowflake() {
+  const snowflake = document.createElement('div');
+  snowflake.className = 'snowflake';
+  snowflake.innerHTML = '❄';
+  snowflake.style.left = Math.random() * window.innerWidth + 'px';
+  snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
+  snowflake.style.opacity = Math.random();
+  snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
+  snowflake.style.animationDelay = Math.random() * 2 + 's';
+  
+  // Add sway animation
+  const swayDuration = Math.random() * 3 + 2;
+  snowflake.style.animation += `, sway ${swayDuration}s ease-in-out infinite`;
+  
+  return snowflake;
+}
+
+function startSnow() {
+  const snowContainer = document.getElementById('snowContainer');
+  if (!snowContainer) return;
+  
+  // Create initial snowflakes
+  for (let i = 0; i < 50; i++) {
+    setTimeout(() => {
+      const snowflake = createSnowflake();
+      snowContainer.appendChild(snowflake);
+      
+      // Remove snowflake after animation
+      setTimeout(() => {
+        if (snowflake.parentNode) {
+          snowflake.parentNode.removeChild(snowflake);
+        }
+      }, 10000);
+    }, Math.random() * 5000);
+  }
+  
+  // Continue creating new snowflakes
+  setInterval(() => {
+    const snowflake = createSnowflake();
+    snowContainer.appendChild(snowflake);
+    
+    setTimeout(() => {
+      if (snowflake.parentNode) {
+        snowflake.parentNode.removeChild(snowflake);
+      }
+    }, 10000);
+  }, 300);
+}
+
+// Start snow effect when page loads
+startSnow();
+</script>
+
+</body>
+</html>
