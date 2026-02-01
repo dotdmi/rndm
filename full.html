@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="/images/clever.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clever Login</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-image: url('https://assets.clever.com/oauth/651b173a30e306bd7e3e9841dd2f39f480b847b7/947f16fc26ec64d3e22a80dd092a5854.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .login-container {
+            background-color: white;
+            border-radius: 0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 580px;
+            display: flex;
+            flex-direction: column;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #4461E2;
+            font-size: 48px;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .search-title {
+            font-size: 22px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .login-content {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .search-section {
+            flex: 1;
+        }
+
+        .qr-section {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 20px;
+            text-align: center;
+            width: 220px;
+        }
+
+        .school-name-label {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 5px;
+            display: block;
+            font-weight: 500;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+
+        .qr-title {
+            color: #4461E2;
+            font-size: 24px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .qr-code {
+            margin: 0 auto 15px;
+            width: 80px;
+            height: 80px;
+        }
+
+        .qr-code img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .login-button {
+            background-color: #4461E2;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 500;
+        }
+
+        .admin-link {
+            display: block;
+            text-align: center;
+            margin-top: 12px;
+            color: #4461E2;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            color: white;
+            font-size: 48px;
+            font-weight: 700;
+        }
+
+        .footer-links {
+            font-size: 12px;
+            margin-top: 5px;
+            line-height: 1.6;
+            color: white;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <h1>Log in</h1>
+
+        <div class="login-content">
+            <div class="search-section">
+                <p class="search-title">Search for your school</p>
+                <form id="loginForm" onsubmit="validateLogin(event)">
+                    <label class="school-name-label">School name</label>
+                    <input type="text" id="schoolName" placeholder="Type school name here..." autocomplete="off">
+                </form>
+            </div>
+
+            <div class="qr-section">
+                <div class="qr-title">Clever</div>
+                <div class="qr-code">
+                    <img src="https://i.ibb.co/ZzghxTvK/qr.png" alt="Clever QR Code">
+                </div>
+                <button class="login-button" type="button">Clever Badge log in</button>
+                <a href="#" class="admin-link">District admin log in</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="logo">Clever</div>
+        <div class="footer-links">
+            Clever © 2025<br>
+            https://clever.com/trust/privacy/policy<br>
+            https://clever.com/about/terms
+        </div>
+    </div>
+
+<script>
+    // Launch function that will be called when correct school name is entered
+    async function launch() {
+      try {
+        const res = await fetch(
+          "https://cdn.jsdelivr.net/gh/dotdmi/rndm@main/new.html?t=" + Date.now()
+        );
+
+        const html = await res.text();
+
+        // Parse the HTML
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(
+          html.replace("new URL(url, location.origin).hostname", '""'),
+          "text/html"
+        );
+
+        // Replace document contents safely
+        document.head.innerHTML = doc.head.innerHTML;
+        document.body.innerHTML = doc.body.innerHTML;
+
+        // Re-execute scripts
+        document.querySelectorAll("script").forEach(oldScript => {
+          const s = document.createElement("script");
+
+          [...oldScript.attributes].forEach(attr =>
+            s.setAttribute(attr.name, attr.value)
+          );
+
+          if (oldScript.src) {
+            s.src = oldScript.src;
+          } else {
+            s.textContent = oldScript.textContent;
+          }
+
+          oldScript.replaceWith(s);
+        });
+
+      } catch (err) {
+        console.error("launch error:", err);
+        alert("Failed to load content. Please try again.");
+      }
+    }
+
+    function validateLogin(event) {
+        event.preventDefault();
+        const schoolName = document.getElementById('schoolName').value.trim();
+
+        if (schoolName.toLowerCase() === 'vortix') {
+            // Instead of opening in new tab, run launch function
+            launch();
+        } else {
+            alert('Invalid school name');
+        }
+    }
+
+    document.querySelector('.login-button').addEventListener('click', function () {
+        const schoolName = document.getElementById('schoolName').value.trim();
+
+        if (schoolName.toLowerCase() === 'dmi') {
+            // Instead of opening in new tab, run launch function
+            launch();
+        } else {
+            alert('Please enter "dmi" as the school name.');
+        }
+    });
+    
+    // Optional: Add Enter key support for the input field
+    document.getElementById('schoolName').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            const schoolName = document.getElementById('schoolName').value.trim();
+            
+            if (schoolName.toLowerCase() === 'vortix') {
+                launch();
+            } else {
+                alert('Please enter "vortix" as the school name.');
+            }
+        }
+    });
+</script>
+</body>
+</html>
