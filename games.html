@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+:root{
+  --bg:#121e1e;
+  --grid:rgba(255,255,255,0.05);
+  --text:#e6e6ff;
+  --border:rgba(255,255,255,0.12);
+  --card-bg:rgba(255,255,255,0.04);
+  --shadow:rgba(0,0,0,0.65);
+}
+
+body{
+  margin:0;
+  font-family:Inter,sans-serif;
+  color:var(--text);
+  background:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+    var(--bg);
+  background-size:40px 40px;
+}
+
+/* HEADER */
+.hero{
+  padding-top:20vh;
+  padding-bottom:4rem;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+}
+
+.hero h1{
+  font-family:Poppins,sans-serif;
+  font-size:3.2rem;
+  font-weight:600;
+  margin:0;
+}
+
+.hero p{
+  margin:.4rem 0 2.2rem;
+  font-size:1.05rem;
+  font-weight:500;
+  opacity:.6;
+}
+
+#searchBar{
+  width:100%;
+  max-width:680px;
+  padding:1.3rem 1.4rem;
+  font-size:1.15rem;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,0.06);
+  color:var(--text);
+  outline:none;
+  backdrop-filter:blur(12px);
+}
+
+/* GRID */
+.main{
+  padding:2.5rem;
+  display:flex;
+  justify-content:center;
+}
+
+#container{
+  width:100%;
+  max-width:1800px;
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  gap:1.6rem;
+}
+
+@media(max-width:1600px){#container{grid-template-columns:repeat(6,1fr);}}
+@media(max-width:1200px){#container{grid-template-columns:repeat(4,1fr);}}
+@media(max-width:700px){#container{grid-template-columns:repeat(2,1fr);}}
+
+/* CARDS */
+.zone-item{
+  position:relative;
+  aspect-ratio:1;
+  border-radius:12px;
+  overflow:hidden;
+  cursor:pointer;
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  transition:transform .35s ease, box-shadow .35s ease;
+}
+
+.zone-item:hover{
+  transform:scale(1.08);
+  box-shadow:0 25px 55px var(--shadow);
+}
+
+.zone-item img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transition:transform .45s ease, filter .45s ease, opacity .25s ease;
+}
+
+.zone-item:hover img{
+  transform:scale(1.1);
+  filter:brightness(0.45);
+}
+
+/* RANDOM GAME */
+.random-overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  font-family:Poppins,sans-serif;
+  font-size:1.6rem;
+  font-weight:500;
+  color:#fff;
+  background:rgba(0,0,0,0.35);
+  z-index:2;
+}
+
+.random-overlay i{
+  font-size:2.4rem;
+  margin-bottom:.6rem;
+}
+
+/* TITLE OVERLAY */
+.zone-name-overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:1rem;
+  font-family:Poppins,sans-serif;
+  font-size:1.35rem;
+  font-weight:500;
+  color:#fff;
+  opacity:0;
+  transition:opacity .3s ease;
+}
+
+.zone-item:hover .zone-name-overlay{
+  opacity:1;
+}
+
+/* FULLSCREEN */
+#fullscreenOverlay{
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:none;
+  flex-direction:column;
+  z-index:3000;
+}
+
+#fullscreenHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:1rem 1.2rem;
+  background:rgba(0,0,0,0.85);
+}
+
+#fullscreenHeader h2{
+  font-family:Poppins,sans-serif;
+  font-size:1.3rem;
+  font-weight:500;
+  margin:0;
+}
+
+.header-btn{
+  background:none;
+  border:none;
+  color:#fff;
+  font-size:1.5rem;
+  cursor:pointer;
+}
+
+#zoneFullscreenFrame{
+  flex:1;
+  width:100%;
+  border:none;
+}
+</style>
+</head>
+
+<body>
+
+<section class="hero">
+  <h1>Games</h1>
+  <p id="gameCount">Showing all games</p>
+  <input id="searchBar" placeholder="Search games..." oninput="filterZones()">
+</section>
+
+<main class="main">
+  <div id="container"></div>
+</main>
+
+<div id="fullscreenOverlay">
+  <div id="fullscreenHeader">
+    <h2 id="gameTitle"></h2>
+    <div>
+      <button class="header-btn" id="fullscreenBtn"><i class="fas fa-expand"></i></button>
+      <button class="header-btn" id="closeFullscreen"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+  <iframe id="zoneFullscreenFrame"></iframe>
+</div>
+
+<script>
+const container = document.getElementById("container");
+const iframe = document.getElementById("zoneFullscreenFrame");
+const overlay = document.getElementById("fullscreenOverlay");
+const title = document.getElementById("gameTitle");
+const count = document.getElementById("gameCount");
+const searchBar = document.getElementById("searchBar");
+
+const zonesURL = "https://cdn.jsdelivr.net/gh/gn-math/assets@main/zones.json";
+const coverURL = "https://cdn.jsdelivr.net/gh/gn-math/covers@main";
+const htmlURL  = "https://cdn.jsdelivr.net/gh/gn-math/html@main";
+
+let zones = [];
+let randomIndex = 1;
+let randomImg;
+
+fetch(zonesURL).then(r=>r.json()).then(z=>{
+  zones = z;
+  count.textContent = `Showing all ${zones.length} games`;
+  displayZones();
+  startRandomCycle();
+});
+
+function displayZones(list = zones){
+  container.innerHTML = "";
+
+  /* RANDOM GAME CARD */
+  const random = document.createElement("div");
+  random.className = "zone-item";
+
+  randomImg = document.createElement("img");
+  randomImg.src = zones[1].cover.replace("{COVER_URL}", coverURL);
+
+  const overlayDiv = document.createElement("div");
+  overlayDiv.className = "random-overlay";
+  overlayDiv.innerHTML = `<i class="fas fa-random"></i>Random Game`;
+
+  random.onclick = launchRandom;
+  random.append(randomImg, overlayDiv);
+  container.appendChild(random);
+
+  list.forEach(zone=>{
+    const card = document.createElement("div");
+    card.className = "zone-item";
+
+    const img = document.createElement("img");
+    img.src = zone.cover.replace("{COVER_URL}", coverURL);
+
+    const name = document.createElement("div");
+    name.className = "zone-name-overlay";
+    name.textContent = zone.name;
+
+    card.onclick = () => openZone(zone);
+    card.append(img, name);
+    container.appendChild(card);
+  });
+}
+
+/* RANDOM IMAGE CYCLE — 0.5s, skip first */
+function startRandomCycle(){
+  setInterval(()=>{
+    if(!randomImg || zones.length < 2) return;
+    randomIndex = (randomIndex + 1) % zones.length;
+    if(randomIndex === 0) randomIndex = 1;
+
+    randomImg.style.opacity = 0;
+    setTimeout(()=>{
+      randomImg.src = zones[randomIndex].cover.replace("{COVER_URL}", coverURL);
+      randomImg.style.opacity = 1;
+    },150);
+  },500);
+}
+
+function launchRandom(){
+  openZone(zones[Math.floor(Math.random() * zones.length)]);
+}
+
+function filterZones(){
+  const q = searchBar.value.toLowerCase();
+  const filtered = zones.filter(z=>z.name.toLowerCase().includes(q));
+  count.textContent = `Showing ${filtered.length} games`;
+  displayZones(filtered);
+}
+
+/* ✅ RESTORED WORKING GAME LOADER */
+async function openZone(zone){
+  overlay.style.display = "flex";
+  title.textContent = zone.name;
+
+  const zoneUrl = zone.url;
+  if(!zoneUrl) return alert("URL missing");
+
+  if(zoneUrl.startsWith("http")){
+    iframe.src = zoneUrl;
+  }else{
+    const fullUrl = zoneUrl.replace("{HTML_URL}", htmlURL);
+    try{
+      const resp = await fetch(fullUrl);
+      const html = await resp.text();
+      const blob = new Blob([html], { type: "text/html" });
+      iframe.src = URL.createObjectURL(blob);
+    }catch{
+      iframe.src = fullUrl;
+    }
+  }
+}
+
+closeFullscreen.onclick = ()=>{
+  overlay.style.display = "none";
+  iframe.src = "";
+};
+
+fullscreenBtn.onclick = ()=>iframe.requestFullscreen();
+</script>
+
+</body>
+</html>
